@@ -33,8 +33,10 @@ export type WebMediaResult = {
 type WebMediaOptions = {
   maxBytes?: number;
   optimizeImages?: boolean;
-  /** Preserve WebP format instead of converting to JPEG (Discord). */
+  /** Preserve WebP format instead of converting to JPEG (e.g. Discord). */
   preserveWebp?: boolean;
+  /** Preserve AVIF format instead of converting to JPEG (e.g. Discord). */
+  preserveAvif?: boolean;
   ssrfPolicy?: SsrFPolicy;
   /** Allowed root directories for local path reads. "any" is deprecated; prefer sandboxValidated + readFile. */
   localRoots?: readonly string[] | "any";
@@ -165,6 +167,7 @@ async function loadWebMediaInternal(
     maxBytes,
     optimizeImages = true,
     preserveWebp = false,
+    preserveAvif = false,
     ssrfPolicy,
     localRoots,
     sandboxValidated = false,
@@ -220,8 +223,10 @@ async function loadWebMediaInternal(
     const cap = maxBytes !== undefined ? maxBytes : maxBytesForKind(params.kind ?? "document");
     if (params.kind === "image") {
       const isGif = params.contentType === "image/gif";
-      const isWebp = params.contentType === "image/webp";
-      const skipOptimization = isGif || (isWebp && preserveWebp) || !optimizeImages;
+      const isPreservedFormat =
+        (params.contentType === "image/webp" && preserveWebp) ||
+        (params.contentType === "image/avif" && preserveAvif);
+      const skipOptimization = isGif || isPreservedFormat || !optimizeImages;
       if (skipOptimization) {
         if (params.buffer.length > cap) {
           throw new Error(formatCapLimit(isGif ? "GIF" : "Media", cap, params.buffer.length));

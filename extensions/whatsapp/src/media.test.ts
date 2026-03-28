@@ -555,7 +555,7 @@ describe("image format handling", () => {
     const result = await loadWebMedia(staticWebpFile, {
       maxBytes: 1024 * 1024,
       localRoots: [fixtureRoot],
-      preserveWebp: true,
+      preserveWebp: true, preserveAvif: true,
     });
 
     // Channels that support WebP natively (e.g. Discord) should get it back as-is.

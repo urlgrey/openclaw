@@ -433,7 +433,7 @@ async function sendDiscordMedia(
 ) {
   const media = await loadWebMedia(mediaUrl, {
     ...buildOutboundMediaLoadOptions({ maxBytes, mediaLocalRoots }),
-    preserveWebp: true,
+    preserveWebp: true, preserveAvif: true,
   });
   const requestedFileName = filename?.trim();
   const resolvedFileName =
