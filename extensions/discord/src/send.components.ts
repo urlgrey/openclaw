@@ -52,6 +52,7 @@ type DiscordComponentSendOpts = {
   agentId?: string;
   mediaUrl?: string;
   mediaLocalRoots?: readonly string[];
+  mediaMaxBytes?: number;
   filename?: string;
 };
 
@@ -100,7 +101,9 @@ async function buildDiscordComponentPayload(params: {
   if (params.opts.mediaUrl) {
     const media = await loadWebMedia(params.opts.mediaUrl, {
       localRoots: params.opts.mediaLocalRoots,
-      preserveWebp: true, preserveAvif: true,
+      maxBytes: params.opts.mediaMaxBytes,
+      preserveWebp: true,
+      preserveAvif: true,
     });
     const filenameOverride = params.opts.filename?.trim();
     const fileName = filenameOverride || media.fileName || "upload";
