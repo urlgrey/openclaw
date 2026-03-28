@@ -1160,7 +1160,7 @@ async function deliverDiscordInteractionReply(params: {
   let hasReplied = false;
   const sendMessage = async (
     content: string,
-    files?: { name: string; data: Buffer }[],
+    files?: { name: string; data: Buffer; contentType?: string }[],
     components?: TopLevelComponents[],
   ) => {
     const payload =
@@ -1173,7 +1173,13 @@ async function deliverDiscordInteractionReply(params: {
                 return { name: file.name, data: file.data };
               }
               const arrayBuffer = Uint8Array.from(file.data).buffer;
-              return { name: file.name, data: new Blob([arrayBuffer]) };
+              return {
+                name: file.name,
+                data: new Blob(
+                  [arrayBuffer],
+                  file.contentType ? { type: file.contentType } : undefined,
+                ),
+              };
             }),
           }
         : {
@@ -1198,10 +1204,12 @@ async function deliverDiscordInteractionReply(params: {
       reply.mediaUrls.map(async (url) => {
         const loaded = await loadWebMedia(url, {
           localRoots: params.mediaLocalRoots,
+          preserveWebp: true,
         });
         return {
           name: loaded.fileName ?? "upload",
           data: loaded.buffer,
+          contentType: loaded.contentType,
         };
       }),
     );
